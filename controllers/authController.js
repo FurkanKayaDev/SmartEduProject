@@ -27,10 +27,8 @@ exports.loginUser = async (req, res) => {
     const valid = await bcrypt.compare(body.password, user.password);
     // şifre doğruysa giriş yap
     if (valid) {
-      res.status(200).json({
-        status: "success",
-        user,
-      });
+      req.session.userID = user._id;
+      res.status(200).redirect("/");
     } else {
       // şifre yanlışsa hata döndür
       res.status(400).json({
@@ -45,4 +43,10 @@ exports.loginUser = async (req, res) => {
       message: "Böyle bir kullanıcı yok",
     });
   }
+};
+
+exports.logoutUser = (req, res) => {
+  req.session.destroy(() => {
+    res.redirect("/");
+  });
 };
