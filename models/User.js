@@ -16,11 +16,23 @@ const UsersSchema = new Schema({
     type: String,
     required: true,
   },
+  role: {
+    type: String,
+    enum: ["student", "teacher", "admin"],
+    default: "student",
+  },
+  courses: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Course",
+    },
+  ],
 });
 
 // Burada şifrelerin encrypt edilerek kaydedilmesi sağlanıyor.
 UsersSchema.pre("save", function (next) {
   const user = this;
+  if (!user.isModified("password")) return next();
   bcrypt.hash(user.password, 10, function (err, encrypted) {
     user.password = encrypted;
     next();

@@ -24,6 +24,10 @@ const CourseSchema = new Schema({
     // burada da referans verdiğimiz modeli belirtiyoruz
     ref: "Category",
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
 });
 
 // strict gereksiz boşlukları ve karakterleri siler

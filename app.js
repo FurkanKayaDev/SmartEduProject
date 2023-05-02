@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const pageRoute = require("./routes/pageRoute");
 const courseRoute = require("./routes/courseRoute");
 const categoryRoute = require("./routes/categoryRoute");
+const methodOverride = require("method-override");
 const userRoute = require("./routes/userRoute");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
@@ -30,6 +31,11 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 // burada session ile kullanıcı bilgilerini tutuyoruz
 app.use(
+  methodOverride("_method", {
+    methods: ["POST", "GET"],
+  })
+);
+app.use(
   session({
     secret: "my_keyboard_cat",
     resave: false,
@@ -38,6 +44,16 @@ app.use(
     store: MongoStore.create({ mongoUrl: "mongodb://localhost/smartedu-db" }),
   })
 );
+// ------------------------------------ * ------------------------------------ //
+// eğer kullanıcı giriş yapmışsa ve dashboard sayfasına gitmek için istekte bulunmuşsa, dashboard sayfasına gitmesine izin vermeden ana sayfaya yönlendiriyoruz. Bu kısa yolu bunun yerine middleware klasörü içindeki authMiddleware.js dosyasında da yapabiliriz.
+app.use("/users/dashboard", (req, res, next) => {
+  if (!req.session.userID) {
+    res.redirect("/login");
+  } else {
+    next();
+  }
+});
+// ------------------------------------ * ------------------------------------ //
 
 // Routes
 // burada kullanıcı giriş yapmış mı diye kontrol ediyoruz
